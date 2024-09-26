@@ -25,11 +25,11 @@ router.get("/", async (req, res) => {
 });
 
 //PUT
-router.put("/:sys_id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { tableName, tableLabelName, fields } = req.body;
 
-    const filter = { sys_id: req.params.sys_id };
+    const filter = { _id: req.params.id };
     const update = {
       tableName: tableName,
       tableLabelName: tableLabelName,
@@ -43,7 +43,7 @@ router.put("/:sys_id", async (req, res) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      res.status(400).json({ message: "sys_id was not found." });
+      res.status(400).json({ message: "id was not found." });
     }
     // Cria um novo documento de metadados
   } catch (error) {
@@ -78,14 +78,14 @@ router.post("/", async (req, res) => {
 });
 
 //GET BY ID
-router.get("/:sys_id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const sys_id = req.params.sys_id;
-    const data = await TableMetadata.findOne({ sys_id });
+    const id = req.params.id;
+    const data = await TableMetadata.findOne({ _id: id });
     if (data) {
       res.status(200).json(data);
     } else {
-      res.status(400).json({ message: "sys_id was not found." });
+      res.status(400).json({ message: "id was not found." });
     }
   } catch (error) {
     res.status(500).json({ message: "Erro ao encontrar registro.", error });
@@ -93,14 +93,14 @@ router.get("/:sys_id", async (req, res) => {
 });
 
 //DELETE
-router.delete("/:sys_id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const sys_id = req.params.sys_id;
-    const data = await TableMetadata.deleteOne({ sys_id });
+    const id = req.params.id;
+    const data = await TableMetadata.deleteOne({ _id: id });
     if (data.deletedCount > 0) {
       res.status(200).json({ message: "successfully deleted." });
     } else {
-      res.status(400).json({ message: "sys_id was not found." });
+      res.status(400).json({ message: "id was not found." });
     }
   } catch (error) {
     res.status(500).json({ message: "Erro ao encontrar registro.", error });

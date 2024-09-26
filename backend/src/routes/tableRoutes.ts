@@ -27,11 +27,11 @@ router.get("/", async (req, res) => {
 });
 
 //PUT
-router.put("/:sys_id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { tableName, tableLabelName, fields } = req.body;
 
-    const filter = { sys_id: req.params.sys_id };
+    const filter = { _id: req.params.id };
     const update = {
       tableName: tableName,
       tableLabelName: tableLabelName,
@@ -54,15 +54,16 @@ router.put("/:sys_id", async (req, res) => {
 });
 
 //POST
-router.post("/:sys_id", async (req, res) => {
+router.post("/:table_id", async (req, res) => {
   try {
     const { data } = req.body; // Dados a serem inseridos no registro
-    const sys_id = req.params.sys_id;
+    const table_id = req.params.table_id;
 
     // Procurar a tabela com o sys_id fornecido
-    const existingTable = await TableMetadata.findOne({ sys_id }).lean();
+    const existingTable = await TableMetadata.findOne({ _id: table_id }).lean();
     if (!existingTable) {
       res.status(400).json({ message: "Tabela não encontrada." });
+      return;
     }
 
     // Validar os campos com base na metadata
@@ -101,20 +102,16 @@ router.post("/:sys_id", async (req, res) => {
     }
 
     // 3. Adicionar um sys_id único ao registro
-    const newData = {
-      ...data,
-      sys_id: uuidv4(), // Gerar um ID único para o novo registro
-    };
 
     // Inserir o novo registro na coleção `tabledata`
     const tableData = new TableData({
-      sys_id, // sys_id da tabela
-      data: newData,
+      table_id, // sys_id da tabela
+      data,
     });
 
     await tableData.save();
 
-    res.status(201).json(newData);
+    res.status(201).json(tableData);
   } catch (error) {
     res.status(500).json({ message: "Erro ao criar o registro.", error });
   }
