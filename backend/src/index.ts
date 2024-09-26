@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
+const tableMetadataRoutes = require("./routes/tableMetadataRoutes");
 const tableRoutes = require("./routes/tableRoutes");
 
 dotenv.config();
@@ -26,8 +27,10 @@ app.get("/", (req, res) => {
   res.send("hello from express");
 });
 
-// Usar as rotas para tabelas
-app.use("/tables/metadata", tableRoutes);
+// configura metadata
+app.use("/tables/metadata", tableMetadataRoutes);
+
+app.use("/tables", tableRoutes);
 
 // Iniciar o servidor
 app.listen(port, () => {
