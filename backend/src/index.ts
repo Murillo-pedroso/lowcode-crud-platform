@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 });
 
 // Usar as rotas para tabelas
-app.use("/create-tables", tableRoutes);
+app.use("/tables/metadata", tableRoutes);
 
 // Iniciar o servidor
 app.listen(port, () => {
