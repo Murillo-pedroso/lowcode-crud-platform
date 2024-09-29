@@ -1,5 +1,5 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid"; // Para gerar um sys_id único
+import { v4 as uuidv4 } from "uuid"; // To generate a unique sys_id
 import TableData from "../models/TableData";
 import TableMetadata from "../models/TableMetadata";
 
@@ -32,143 +32,135 @@ router.get("/:table_id", async (req, res) => {
       res.status(200).json(response);
       return;
     } else {
-      res.status(200).json({ message: "No data was found." });
+      res.status(200).json({ message: "No data found." });
       return;
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao criar tabela", error });
+    res.status(500).json({ message: "Error while fetching data.", error });
   }
 });
 
-//PUT
+// PUT
 router.put("/:table_id/:id", async (req, res) => {
   try {
-    const { data } = req.body; // Dados a serem inseridos no registro
+    const { data } = req.body; // Data to be inserted in the record
     const table_id = req.params.table_id;
     const id = req.params.id;
 
-    // Procurar a tabela com o sys_id fornecido
+    // Search for the table with the provided sys_id
     const existingTable = await TableMetadata.findOne({ _id: table_id }).lean();
     if (!existingTable) {
-      res.status(400).json({ message: "Tabela não encontrada." });
+      res.status(400).json({ message: "Table not found." });
       return;
     }
-    const existingRecord = await TableData.findOne({
-      _id: id,
-    });
+    const existingRecord = await TableData.findOne({ _id: id });
 
     if (!existingRecord) {
       res.status(400).json({ message: "Record not found." });
       return;
     }
 
-    // Validar os campos com base na metadata
-    const fieldsMetadata = existingTable?.fields; // Metadados da tabela
+    // Validate fields based on metadata
+    const fieldsMetadata = existingTable?.fields; // Table metadata
     if (!fieldsMetadata) {
-      res.status(400).json({ message: "error" });
+      res.status(400).json({ message: "Error." });
       return;
     }
     const fieldNames = fieldsMetadata.map((field: { name: any }) => field.name);
 
-    // 1. Verificar se existem campos a mais no JSON do que os definidos na tabela
+    // 1. Check for fields in JSON that are not defined in the table
     for (const key in data) {
       if (!fieldNames.includes(key)) {
-        res.status(400).json({ message: `Campo '${key}' não é permitido.` });
+        res.status(400).json({ message: `Field '${key}' is not allowed.` });
         return;
       }
     }
 
-    // 2. Validar os campos obrigatórios e seus tipos
+    // 2. Validate required fields and their types
     for (const field of fieldsMetadata) {
       const fieldName = field.name;
       const fieldType = field.type;
 
-      // Verificar se o campo é obrigatório
+      // Check if the field is required
       if (data[fieldName] === undefined) {
-        res
-          .status(400)
-          .json({ message: `Campo '${fieldName}' é obrigatório.` });
+        res.status(400).json({ message: `Field '${fieldName}' is required.` });
       }
 
-      // Verificar o tipo do campo
+      // Check the field type
       if (typeof data[fieldName] !== fieldType) {
         res.status(400).json({
-          message: `Campo '${fieldName}' deve ser do tipo '${fieldType}'.`,
+          message: `Field '${fieldName}' must be of type '${fieldType}'.`,
         });
         return;
       }
     }
 
     const update = {
-      table_id, // sys_id da tabela
+      table_id, // sys_id of the table
       data,
     };
-    // Inserir o novo registro na coleção `tabledata`
+    // Insert the new record in the `tabledata` collection
     const response = await existingRecord.updateOne(update, {
       new: true,
     });
 
     res.status(201).json(response);
   } catch (error) {
-    res.status(500).json({ message: "Erro ao atualizar registro.", error });
+    res.status(500).json({ message: "Error while updating record.", error });
   }
 });
 
-//POST
+// POST
 router.post("/:table_id", async (req, res) => {
   try {
-    const { data } = req.body; // Dados a serem inseridos no registro
+    const { data } = req.body; // Data to be inserted in the record
     const table_id = req.params.table_id;
 
-    // Procurar a tabela com o sys_id fornecido
+    // Search for the table with the provided sys_id
     const existingTable = await TableMetadata.findOne({ _id: table_id }).lean();
     if (!existingTable) {
-      res.status(400).json({ message: "Tabela não encontrada." });
+      res.status(400).json({ message: "Table not found." });
       return;
     }
 
-    // Validar os campos com base na metadata
-    const fieldsMetadata = existingTable?.fields; // Metadados da tabela
+    // Validate fields based on metadata
+    const fieldsMetadata = existingTable?.fields; // Table metadata
     if (!fieldsMetadata) {
-      res.status(400).json({ message: "error" });
+      res.status(400).json({ message: "Error." });
       return;
     }
     const fieldNames = fieldsMetadata.map((field: { name: any }) => field.name);
 
-    // 1. Verificar se existem campos a mais no JSON do que os definidos na tabela
+    // 1. Check for fields in JSON that are not defined in the table
     for (const key in data) {
       if (!fieldNames.includes(key)) {
-        res.status(400).json({ message: `Campo '${key}' não é permitido.` });
+        res.status(400).json({ message: `Field '${key}' is not allowed.` });
         return;
       }
     }
 
-    // 2. Validar os campos obrigatórios e seus tipos
+    // 2. Validate required fields and their types
     for (const field of fieldsMetadata) {
       const fieldName = field.name;
       const fieldType = field.type;
 
-      // Verificar se o campo é obrigatório
+      // Check if the field is required
       if (data[fieldName] === undefined) {
-        res
-          .status(400)
-          .json({ message: `Campo '${fieldName}' é obrigatório.` });
+        res.status(400).json({ message: `Field '${fieldName}' is required.` });
       }
 
-      // Verificar o tipo do campo
+      // Check the field type
       if (typeof data[fieldName] !== fieldType) {
         res.status(400).json({
-          message: `Campo '${fieldName}' deve ser do tipo '${fieldType}'.`,
+          message: `Field '${fieldName}' must be of type '${fieldType}'.`,
         });
         return;
       }
     }
 
-    // 3. Adicionar um sys_id único ao registro
-
-    // Inserir o novo registro na coleção `tabledata`
+    // Insert the new record in the `tabledata` collection
     const tableData = new TableData({
-      table_id, // sys_id da tabela
+      table_id, // sys_id of the table
       data,
     });
 
@@ -176,11 +168,11 @@ router.post("/:table_id", async (req, res) => {
 
     res.status(201).json(tableData);
   } catch (error) {
-    res.status(500).json({ message: "Erro ao criar o registro.", error });
+    res.status(500).json({ message: "Error while creating record.", error });
   }
 });
 
-//GET BY ID
+// GET BY ID
 router.get("/:table_id/:id", async (req, res) => {
   try {
     const data = await TableData.find({
@@ -213,22 +205,22 @@ router.get("/:table_id/:id", async (req, res) => {
       return;
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao criar tabela", error });
+    res.status(500).json({ message: "Error while fetching data.", error });
   }
 });
 
-//DELETE
+// DELETE
 router.delete("/:sys_id", async (req, res) => {
   try {
     const sys_id = req.params.sys_id;
     const data = await TableData.deleteOne({ sys_id });
     if (data.deletedCount > 0) {
-      res.status(200).json({ message: "successfully deleted." });
+      res.status(200).json({ message: "Successfully deleted." });
     } else {
-      res.status(400).json({ message: "sys_id was not found." });
+      res.status(400).json({ message: "sys_id not found." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao encontrar registro.", error });
+    res.status(500).json({ message: "Error while deleting record.", error });
   }
 });
 

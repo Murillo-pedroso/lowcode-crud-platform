@@ -16,15 +16,15 @@ router.get("/", async (req, res) => {
       res.status(200).json(data);
       return;
     } else {
-      res.status(200).json({ message: "No data was found." });
+      res.status(200).json({ message: "No data found." });
       return;
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao criar tabela", error });
+    res.status(500).json({ message: "Error while fetching data.", error });
   }
 });
 
-//PUT
+// PUT
 router.put("/:id", async (req, res) => {
   try {
     const { tableName, tableLabelName, fields } = req.body;
@@ -43,41 +43,41 @@ router.put("/:id", async (req, res) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      res.status(400).json({ message: "id was not found." });
+      res.status(400).json({ message: "ID not found." });
     }
-    // Cria um novo documento de metadados
   } catch (error) {
-    res.status(500).json({ message: "Erro ao atualizar registro.", error });
+    res.status(500).json({ message: "Error while updating record.", error });
   }
 });
 
-//POST
+// POST
 router.post("/", async (req, res) => {
   try {
     const { tableName, tableLabelName, fields } = req.body;
 
     const existingTable = await TableMetadata.findOne({ tableName });
     if (existingTable) {
-      res.status(400).json({ message: "O nome da tabela já existe." });
+      res.status(400).json({ message: "Table name already exists." });
       return;
     }
-    // Cria um novo documento de metadados
+
+    // Create a new metadata document
     const tableMetadata = new TableMetadata({
       tableName,
       tableLabelName,
       fields,
     });
 
-    // Salva os metadados no MongoDB
+    // Save the metadata in MongoDB
     const data = await tableMetadata.save();
 
     res.status(201).json(data);
   } catch (error) {
-    res.status(500).json({ message: "Erro ao criar tabela", error });
+    res.status(500).json({ message: "Error while creating table.", error });
   }
 });
 
-//GET BY ID
+// GET BY ID
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -85,25 +85,25 @@ router.get("/:id", async (req, res) => {
     if (data) {
       res.status(200).json(data);
     } else {
-      res.status(400).json({ message: "id was not found." });
+      res.status(400).json({ message: "ID not found." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao encontrar registro.", error });
+    res.status(500).json({ message: "Error while fetching record.", error });
   }
 });
 
-//DELETE
+// DELETE
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const data = await TableMetadata.deleteOne({ _id: id });
     if (data.deletedCount > 0) {
-      res.status(200).json({ message: "successfully deleted." });
+      res.status(200).json({ message: "Successfully deleted." });
     } else {
-      res.status(400).json({ message: "id was not found." });
+      res.status(400).json({ message: "ID not found." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Erro ao encontrar registro.", error });
+    res.status(500).json({ message: "Error while deleting record.", error });
   }
 });
 
