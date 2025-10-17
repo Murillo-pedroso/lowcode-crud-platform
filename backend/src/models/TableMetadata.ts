@@ -8,6 +8,7 @@ interface ITableMetadata extends Document {
     name: string;
     label: string;
     type: string;
+    mandatory: boolean;
   }[];
 }
 
@@ -20,6 +21,7 @@ const TableMetadataSchema: Schema = new Schema({
       name: { type: String, required: true },
       label: { type: String, required: true },
       type: { type: String, required: true },
+      mandatory: {type: Boolean , required: true}
     },
   ],
 });

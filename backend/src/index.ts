@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 
 const tableMetadataRoutes = require("./routes/tableMetadataRoutes");
 const tableRoutes = require("./routes/tableRoutes");
@@ -9,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const port = 5000;
-
+app.use(cors());
 // Configurar o middleware para processar JSON
 app.use(express.json());
 

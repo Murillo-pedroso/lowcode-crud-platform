@@ -80,14 +80,16 @@ router.put("/:table_id/:id", async (req, res) => {
     for (const field of fieldsMetadata) {
       const fieldName = field.name;
       const fieldType = field.type;
+      const mandatory = field.mandatory;
 
       // Check if the field is required
-      if (data[fieldName] === undefined) {
+      if (data[fieldName] === undefined  && mandatory) {
         res.status(400).json({ message: `Field '${fieldName}' is required.` });
+        return
       }
 
       // Check the field type
-      if (typeof data[fieldName] !== fieldType) {
+      if (typeof data[fieldName] !== fieldType && data[fieldName] !== undefined) {
         res.status(400).json({
           message: `Field '${fieldName}' must be of type '${fieldType}'.`,
         });
@@ -143,14 +145,16 @@ router.post("/:table_id", async (req, res) => {
     for (const field of fieldsMetadata) {
       const fieldName = field.name;
       const fieldType = field.type;
+      const mandatory = field.mandatory;
 
       // Check if the field is required
-      if (data[fieldName] === undefined) {
+      if (data[fieldName] === undefined && mandatory) {
         res.status(400).json({ message: `Field '${fieldName}' is required.` });
+        return
       }
 
       // Check the field type
-      if (typeof data[fieldName] !== fieldType) {
+      if (typeof data[fieldName] !== fieldType && data[fieldName] !== undefined) {
         res.status(400).json({
           message: `Field '${fieldName}' must be of type '${fieldType}'.`,
         });
@@ -210,10 +214,10 @@ router.get("/:table_id/:id", async (req, res) => {
 });
 
 // DELETE
-router.delete("/:sys_id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const sys_id = req.params.sys_id;
-    const data = await TableData.deleteOne({ sys_id });
+    const id = req.params.id;
+    const data = await TableData.deleteOne({ _id: id });
     if (data.deletedCount > 0) {
       res.status(200).json({ message: "Successfully deleted." });
     } else {
